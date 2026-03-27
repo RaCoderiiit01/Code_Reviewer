@@ -24,13 +24,30 @@ const cors = require('cors');
 
 const app = express();
 
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+const allowedOrigins = [
+  'https://code-reviewer-one-wine.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
 
-app.options('*', cors()); 
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (e.g. mobile apps, curl, Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
+
+// Handle preflight requests for all routes
+app.options('*', cors(corsOptions));
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
