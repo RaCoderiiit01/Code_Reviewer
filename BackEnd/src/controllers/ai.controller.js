@@ -9,9 +9,12 @@ module.exports.getReview = async (req, res) => {
         return res.status(400).send("Prompt is required");
     }
 
-    const response = await aiService(code);
-
-
-    res.send(response);
+    try {
+        const response = await aiService(code);
+        res.send(response);
+    } catch (error) {
+        console.error("AI service error:", error.message);
+        res.status(500).send("Something went wrong while generating the review.");
+    }
 
 }
